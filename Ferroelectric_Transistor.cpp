@@ -1,59 +1,95 @@
+#include <iostream>
+#include <cmath>
+
 class FeFET {
+  private:
+    double mobility; // electron mobility in the channel
+    double oxideCapacitance; // oxide capacitance per unit area
+    double channelWidth; // width of the channel
+    double channelLength; // length of the channel
+    double thresholdVoltage; // threshold voltage
+    double polarization; // polarization state of the ferroelectric material in the gate stack
+    double gateVoltage;
+  public:
+    // Constructor
+    FeFET() {
+      oxideCapacitance = 0.0;
+      channelWidth = 0.0;
+      channelLength = 0.0;
+      thresholdVoltage = 0.0;
+      polarization = 0.0; // initialize polarization to zero
+      mobility = 0.0; // initialize mobilty to zero
+    }
+
     
-private:
-    // Transistor Characteristics
-    double Me;          // Mobility of Electron
-    double Cox;         // Gate Oxide Capacitance per unit area
-    double W_gate;      // Gate Junction Width
-    double L_gate;      // Gate Junction Length
-    double Vgs;         // Gate Source Voltage
-    double Vth;         // Threshold Voltage
-    double Vds;         // Drain Source Saturation Voltage
 
-    // Ferroelectric Layer Characteristics
-    double Q_fe;        // Charge stored in the ferroelectric layer
-    double A_fe;        // Area of the ferroelectric layer
-    double perm_fe;     // Permittivity of ferroelectric material
-    double d_fe;        // Thickness of the ferroelectric layer
-
-    // General Characteristics needed to represent the Ferroelectric Field Effect Transistor (FeFET)
-    double Id;          // Drain Current
-    double P_fe;        // Polarization of the Ferroelectric Layer
-    double C_fe;        // Capacitance of the Ferroelectric Layer
-    double V_fe;        // Voltage across the Ferroelectric Layer
-
-public:
-    FeFET(double Me, double Cox, double W_gate, double L_gate, double Vgs, double Vth, double Vds,
-          double Q_fe, double A_fe, double perm_fe, double d_fe)
-
-        : Me(Me), Cox(Cox), W_gate(W_gate), L_gate(L_gate), Vgs(Vgs), Vth(Vth), Vds(Vds),
-          Q_fe(Q_fe), A_fe(A_fe), perm_fe(perm_fe), d_fe(d_fe) {}
-
-    void setDrainVoltage(double voltage) {
-        Vds = voltage;
+     // Set Length and Width of the FeFET
+    void setOxideCapacitance(double Cox) {
+      oxideCapacitance = Cox;
     }
 
-    void setGateSourceVoltage(double voltage) {
-        Vgs = voltage;
+    // Set Length and Width of the FeFET
+    void setWidthAndLength(double W, double L) {
+      channelWidth = W;
+      channelLength = L;
     }
 
-    double getDrainCurrent() {
-        Id = Me * Cox * (W_gate / L_gate) * ((Vgs - Vth) * Vds - 0.5 * Vds * Vds);
-        return Id;
+    // Set Threshold Voltage to a constant value
+    void setThresholdVoltage(double Vth) {
+      thresholdVoltage = Vth;
     }
 
-    double getFerroelectricPolarization() {
-        P_fe = Q_fe / A_fe;
-        return P_fe;
+    // Set polarization state of the ferroelectric material in the gate stack
+    void setPolarization(double pol) {
+      polarization = pol;
     }
 
-    double getFerroelectricCapacitance() {
-        C_fe = perm_fe * A_fe / d_fe;
-        return C_fe;
+    // Set mobilty of the elecron ferroelectric material in the gate stack
+    void setMobility(double mob) {
+      mobility = mob;
     }
 
-    double getFerroelectricVoltage() {
-        V_fe = Q_fe / C_fe;
-        return V_fe;
+    double getOxideCapacitance() const {
+  return oxideCapacitance;
+}
+
+double getWidth() const {
+  return channelWidth;
+}
+
+double getLength() const {
+  return channelLength;
+}
+
+double getThresholdVoltage() const {
+  return thresholdVoltage;
+}
+
+double getPolarization() const {
+  return polarization;
+}
+
+double getMobility() const {
+  return mobility;
+}
+
+double getGateVoltage() const {
+  return gateVoltage;
+}
+
+double getChannelWidth() const {
+      return channelWidth;
+    }
+
+double getChannelLength() const {
+      return channelLength;
+    }
+
+
+    // Calculate drain current for given gate-source voltage
+    double DrainCurrent(double V_GS) {
+      double V_T_mod = thresholdVoltage + polarization; // modify threshold voltage based on polarization state
+      double I_D = mobility * oxideCapacitance * (channelWidth/channelLength) * pow((V_GS - V_T_mod), 2) / 2.0;
+      return I_D;
     }
 };
