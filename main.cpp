@@ -1,31 +1,29 @@
-#include <iostream>
-#include "Ferroelectric_Transistor.cpp"
+#include <iomanip>
+#include "Ferroelectric_Transistor.cpp" // Include the FeFET header file
 
 int main() {
-    // Set up FeFET with initial parameters
-    double Me = 0.1;
-    double Cox = 1e-6;
-    double W_gate = 1e-4;
-    double L_gate = 1e-4;
-    double Vth = 1.0;
-    double Qfe = 1e-9;
-    double A_fe = 1e-8;
-    double prem_fe = 1e-8;
-    double d_fe = 1e-7;
-    FeFET myFeFET(Me, Cox, W_gate, L_gate, 0.0, Vth, 0.0, Qfe, A_fe, prem_fe, d_fe);
+  FeFET fefet;
 
-    // Set input voltages
-    double Vgs = 1.5;
-    double Vds = 1.0;
-    myFeFET.setGateSourceVoltage(Vgs);
-    myFeFET.setDrainVoltage(Vds);
+  // set FeFET parameters
+  fefet.setOxideCapacitance(3e-9);
+  fefet.setWidthAndLength(1e-6, 0.1e-6);
+  fefet.setThresholdVoltage(0.5);
+  fefet.setPolarization(0.2);
+  fefet.setMobility(100);
 
-    // Calculate and output results
-    std::cout << "Input voltages: Vgs = " << Vgs << " V, Vds = " << Vds << " V\n";
-    std::cout << "Drain current: " << myFeFET.getDrainCurrent() << " A\n";
-    std::cout << "Ferroelectric polarization: " << myFeFET.getFerroelectricPolarization() << " C/m^2\n";
-    std::cout << "Ferroelectric capacitance: " << myFeFET.getFerroelectricCapacitance() << " F\n";
-    std::cout << "Ferroelectric voltage: " << myFeFET.getFerroelectricVoltage() << " V\n";
+  // test drain current calculation
+  double V_GS = 1.0;
+  double I_D = fefet.DrainCurrent(V_GS);
 
-    return 0;
+  std::cout << "For V_GS = " << V_GS << " V, the drain current is " << std::scientific << std::setprecision(6) << I_D << " A" << std::endl;
+
+  // test getters
+  std::cout << "Oxide Capacitance: " << fefet.getOxideCapacitance() << " F/m^2" << std::endl;
+  std::cout << "Channel Width: " << fefet.getChannelWidth() << " m" << std::endl;
+  std::cout << "Channel Length: " << fefet.getChannelLength() << " m" << std::endl;
+  std::cout << "Threshold Voltage: " << fefet.getThresholdVoltage() << " V" << std::endl;
+  std::cout << "Polarization: " << fefet.getPolarization() << std::endl;
+  std::cout << "Mobility: " << fefet.getMobility() << " cm^2/Vs" << std::endl;
+
+  return 0;
 }
