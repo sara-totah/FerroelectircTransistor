@@ -1,95 +1,102 @@
 #include <iostream>
 #include <cmath>
+//********************** NCFET Equations **********************//
 
-class FeFET {
+class NCFET {
   private:
-    double mobility; // electron mobility in the channel
     double oxideCapacitance; // oxide capacitance per unit area
     double channelWidth; // width of the channel
     double channelLength; // length of the channel
     double thresholdVoltage; // threshold voltage
-    double polarization; // polarization state of the ferroelectric material in the gate stack
-    double gateVoltage;
+
+    const double ferroelectricAlpha = -1.8 * pow(10,11); //Alpha Cofficient of the ferroelectric cn/F
+    const double ferroelectricBeta = 10 * pow(10,22); //Beta Cofficient of the ferroelectric cm^5/F/Coul^2
+    const double ferroelectricGamma = 0; //Gamma Cofficicent of the ferroelectric cm^9/F/Coul^4
+    const double ferroelectricRho = 9;  //Rho coefficient of the ferroelectric cm - s/F
+    const double ferroelectricTfe = 10 * pow(10,-7); //Thickness of the ferroelectric dielectric
+
+
+    //******************** Cell Nodes ********************//
+    double gateVoltage; //input
+    const double sourceVoltage = 1; //kept at constant value
+    double drainVoltage; //output
+
+    double ferroelectricVoltage;
+
+    // Gate attributes
+    double gateCharge;
+    const double gateCapacitance = 0.3;
+    
+    //time step should be taken frm the HSPICE Model
+    const int timeStep = 1;
+
+
+    double oxideVoltage; //equals Vox + Vmos (constants)
+
+
   public:
     // Constructor
-    FeFET() {
-      oxideCapacitance = 0.0;
-      channelWidth = 0.0;
-      channelLength = 0.0;
-      thresholdVoltage = 0.0;
-      polarization = 0.0; // initialize polarization to zero
-      mobility = 0.0; // initialize mobilty to zero
+    NCFET(double gateVoltage) {
+      setGateCharge();
+      FerroelectricVoltage();
+      operation(gateVoltage);
     }
 
-    
-
-     // Set Length and Width of the FeFET
-    void setOxideCapacitance(double Cox) {
-      oxideCapacitance = Cox;
-    }
-
-    // Set Length and Width of the FeFET
-    void setWidthAndLength(double W, double L) {
-      channelWidth = W;
-      channelLength = L;
-    }
 
     // Set Threshold Voltage to a constant value
-    void setThresholdVoltage(double Vth) {
-      thresholdVoltage = Vth;
+    void setThresholdVoltage() {
+      thresholdVoltage = oxideVoltage + ferroelectricVoltage;
     }
 
-    // Set polarization state of the ferroelectric material in the gate stack
-    void setPolarization(double pol) {
-      polarization = pol;
-    }
-
-    // Set mobilty of the elecron ferroelectric material in the gate stack
-    void setMobility(double mob) {
-      mobility = mob;
+    void setGateCharge(){
+      gateCharge = gateCapacitance * gateVoltage;
     }
 
     double getOxideCapacitance() const {
-  return oxideCapacitance;
-}
+      return oxideCapacitance;
+    }
 
-double getWidth() const {
-  return channelWidth;
-}
-
-double getLength() const {
-  return channelLength;
-}
-
-double getThresholdVoltage() const {
-  return thresholdVoltage;
-}
-
-double getPolarization() const {
-  return polarization;
-}
-
-double getMobility() const {
-  return mobility;
-}
-
-double getGateVoltage() const {
-  return gateVoltage;
-}
-
-double getChannelWidth() const {
+    double getWidth() const {
       return channelWidth;
     }
 
-double getChannelLength() const {
+    double getLength() const {
+      return channelLength;
+    }
+
+    double getThresholdVoltage() const {
+      return thresholdVoltage;
+    }
+
+
+    double getGateVoltage() const {
+      return gateVoltage;
+    }
+
+    double getChannelWidth() const {
+      return channelWidth;
+    }
+
+    double getChannelLength() const {
       return channelLength;
     }
 
 
-    // Calculate drain current for given gate-source voltage
-    double DrainCurrent(double V_GS) {
-      double V_T_mod = thresholdVoltage + polarization; // modify threshold voltage based on polarization state
-      double I_D = mobility * oxideCapacitance * (channelWidth/channelLength) * pow((V_GS - V_T_mod), 2) / 2.0;
-      return I_D;
+
+    void FerroelectricVoltage (){
+      ferroelectricVoltage = (2* ferroelectricAlpha * ferroelectricTfe * gateCharge) + (4 * ferroelectricBeta * ferroelectricTfe * pow(gateCharge,3)) + (6 * ferroelectricGamma * ferroelectricTfe * pow(gateCharge,5)) + (ferroelectricRho * ferroelectricTfe * gateCharge /timeStep);
+    }
+
+    void operation (double GateVoltage){
+      //cutoff Region
+      if ((GateVoltage - sourceVoltage < thresholdVoltage)){
+        drainVoltage = 0;
+      }
+      else if ((GateVoltage - sourceVoltage >= thresholdVoltage ) && (drainVoltage < (gateVoltage - thresholdVoltage))){
+        drainVoltage = ((((gateVoltage - sourceVoltage) - ((drainVoltage - sourceVoltage)/2)) - thresholdVoltage) * (drainVoltage - sourceVoltage))/(gateVoltage - thresholdVoltage);
+      }
+      else if (drainVoltage >= (gateVoltage - thresholdVoltage)){
+        drainVoltage = pow((gateVoltage - thresholdVoltage),2);
+      }
     }
 };
