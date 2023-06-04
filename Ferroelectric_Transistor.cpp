@@ -36,7 +36,8 @@ class NCFET {
 
   public:
     // Constructor
-    NCFET(double gateVoltage) {
+    NCFET(double Voltage) {
+      this.gateVoltage = Voltage;
       setGateCharge();
       FerroelectricVoltage();
       operation(gateVoltage);
