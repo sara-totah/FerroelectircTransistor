@@ -31,7 +31,7 @@ class NCFET {
     const int timeStep = 1;
 
 
-    double oxideVoltage; //equals Vox + Vmos (constants)
+    double oxideVoltage = 0; //equals Vox + Vmos (constants)
 
 
   public:
