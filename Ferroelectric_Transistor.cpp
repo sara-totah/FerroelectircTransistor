@@ -40,6 +40,7 @@ class NCFET {
       this.gateVoltage = Voltage;
       setGateCharge();
       FerroelectricVoltage();
+      setThresholdVoltage();
       operation(gateVoltage);
     }
 
