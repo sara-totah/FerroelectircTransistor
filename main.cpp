@@ -47,7 +47,8 @@ class NCFET {
 
     // Set Threshold Voltage to a constant value
     void setThresholdVoltage() {
-      thresholdVoltage = oxideVoltage + ferroelectricVoltage;
+      //thresholdVoltage = oxideVoltage + ferroelectricVoltage;
+      thresholdVoltage = 0.32;
     }
 
     void setGateCharge(){
