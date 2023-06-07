@@ -51,7 +51,7 @@ class NCFET {
     }
 
     void setGateCharge(){
-      gateCharge = gateCapacitance * gateVoltage;
+      this.gateCharge = this.gateCapacitance * this.gateVoltage;
     }
 
     double getOxideCapacitance() const {
