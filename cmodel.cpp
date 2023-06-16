@@ -99,3 +99,4 @@ int main(){
 int NOT_Gate(NCFET transistor){
     return transistor.getDrainVoltage() < 1;
 }
+
